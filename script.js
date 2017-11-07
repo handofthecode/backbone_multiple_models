@@ -47,7 +47,7 @@ var AppView = Backbone.View.extend({
     'click #delete-all' : 'handleDeleteAll',
     'click th' : 'handleSort', 
   },
-  handleSort: function() {
+  handleSort: function(e) {
     this.collection.comparator = e.target.dataset.prop;
     this.collection.sort();
   },
