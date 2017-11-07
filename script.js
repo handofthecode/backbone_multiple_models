@@ -40,44 +40,37 @@ var ItemsView = Backbone.View.extend({
   }
 });
 
-var app = {
-  registerListeners: function() {
-    this.$form.on('submit', this.handleSubmit.bind(this));
-    this.$deleteAll.on('click', this.handleDeleteAll.bind(this));
-    this.$categories.on('click', this.handleSort.bind(this));
+var AppView = Backbone.View.extend({
+  el: 'body',
+  events: {
+    'submit form' : 'handleSubmit',
+    'click #delete-all' : 'handleDeleteAll',
+    'click th' : 'handleSort', 
   },
-  handleSort: function(e) {
-    this.items.comparator = e.target.dataset.prop;
-    this.items.sort();
+  handleSort: function() {
+    this.collection.comparator = e.target.dataset.prop;
+    this.collection.sort();
   },
-  handleDeleteAll: function() {
-    this.items.reset();
+  handleDeleteAll: function(e) {
+    e.preventDefault();
+    this.collection.reset();
   },
   handleSubmit: function(e) {
     e.preventDefault();
-    this.items.add({ 
-      name: this.$name.val(),
-      quantity: this.$quantity.val(),
-      id: this.items.serialId++,
-    });
-    this.view.render();  
+    var data = { 
+      name: $('[name="name"]').val(),
+      quantity: $('[name="quantity"]').val(),
+      id: this.collection.serialId++,
+    }
+    this.collection.add(data);
   },
-  handleDelete: function(e) {
-    e.preventDefault();
-    var $target = $(e.target);
-    var id = $target.attr('data-id');
-    this.items.remove(id);
-    $target.closest('tr').remove();
-  },
+});
+
+var app = {
   init: function() {
-    this.$categories = $('th');
-    this.$form = $('form');
-    this.$deleteAll = $('#delete-all');
-    this.$name = $('[name=name]');
-    this.$quantity = $('[name=quantity]');
     this.items = new Items(items_json);
-    this.view = new ItemsView({ collection: this.items })
-    this.registerListeners();
+    this.itemView = new ItemsView({ collection: this.items })
+    this.appView = new AppView({ collection: this.items });
   }
 }
 
